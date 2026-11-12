@@ -1,0 +1,28 @@
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+local.properties
+secrets.properties
+service-role*.json
+supabase/.temp/
+
+# Android / Gradle generated files
+.gradle/
+/build/
+**/build/
+.cxx/
+.externalNativeBuild/
+captures/
+
+# IDE and OS files
+.idea/
+*.iml
+.DS_Store
+Thumbs.db

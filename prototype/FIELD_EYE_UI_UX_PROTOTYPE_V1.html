@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>FIELD EYE — V1 UI/UX Review Prototype</title>
+<style>
+:root {
+  color-scheme: light;
+  --canvas: #e8e9e2;
+  --paper: #f4f2ea;
+  --surface: #fffefa;
+  --surface-2: #edf0e9;
+  --ink: #18231f;
+  --muted: #59665f;
+  --line: #d6dcd4;
+  --green: #183a33;
+  --green-2: #254b41;
+  --teal: #08766f;
+  --teal-soft: #e0f1eb;
+  --amber: #986000;
+  --amber-soft: #fbefd8;
+  --red: #a33f35;
+  --neutral: #68736e;
+  --shadow: 0 28px 80px rgba(20, 38, 31, .16), 0 3px 10px rgba(20, 38, 31, .08);
+  --radius-card: 18px;
+  --radius-control: 13px;
+  --phone-w: 390px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; background: var(--canvas); color: var(--ink); font-size: 14px; }
+button, input, select, textarea { font: inherit; }
+button { color: inherit; }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid #13877a; outline-offset: 2px; }
+.app-shell { min-height: 100vh; display: grid; grid-template-rows: 62px 1fr; }
+.review-bar { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 0 26px; border-bottom: 1px solid rgba(30,53,45,.13); background: rgba(247,247,241,.8); }
+.brandline { display:flex; align-items:center; gap:12px; min-width:0; }
+.brand-word { font-size: 15px; font-weight: 790; letter-spacing: .15em; color:var(--green); white-space:nowrap; }
+.review-tag { color:var(--muted); font-size:11px; letter-spacing:.1em; text-transform:uppercase; padding-left:12px; border-left:1px solid var(--line); white-space:nowrap; }
+.review-controls { display:flex; align-items:center; gap:8px; }
+.review-controls select, .review-controls button { border:1px solid var(--line); background:var(--surface); border-radius:11px; padding:9px 12px; min-height:40px; color:var(--ink); }
+.review-controls button { cursor:pointer; font-weight:650; }
+.review-controls button:hover { background:var(--surface-2); }
+.review-layout { display:grid; grid-template-columns: 230px minmax(390px, 1fr) 250px; gap:26px; align-items:start; max-width:1420px; width:100%; margin:0 auto; padding:26px 28px 34px; }
+.screen-index, .inspector { position:sticky; top:22px; max-height:calc(100vh - 110px); overflow:auto; scrollbar-width:thin; }
+.panel-kicker { color:var(--muted); text-transform:uppercase; font-size:10px; font-weight:750; letter-spacing:.16em; margin:4px 0 13px; }
+.index-group { margin-bottom:17px; }
+.index-group h2 { font-size:11px; text-transform:uppercase; letter-spacing:.09em; color:#77817b; margin:0 0 7px 9px; }
+.index-button { display:flex; width:100%; align-items:center; gap:10px; min-height:39px; padding:6px 10px; margin:2px 0; text-align:left; border:0; border-radius:10px; background:transparent; color:#44524b; cursor:pointer; }
+.index-button .num { font-variant-numeric:tabular-nums; font-size:10px; color:#88928c; width:22px; }
+.index-button:hover { background:rgba(255,255,255,.65); }
+.index-button.active { color:var(--green); background:#fffefa; box-shadow:0 2px 8px rgba(31,52,44,.06); font-weight:700; }
+.center-stage { display:flex; flex-direction:column; align-items:center; gap:12px; min-width:0; }
+.stage-caption { width:min(100%, var(--phone-w)); display:flex; justify-content:space-between; align-items:center; padding:0 4px; font-size:11px; color:#68736e; }
+.device-wrap { width:min(100%, var(--phone-w)); }
+.phone { width:100%; height:min(820px, calc(100vh - 124px)); min-height:620px; border:7px solid #23332d; border-radius:34px; overflow:hidden; background:var(--paper); box-shadow:var(--shadow); position:relative; display:flex; flex-direction:column; }
+.phone-top { height:27px; flex:0 0 27px; display:flex; align-items:center; justify-content:space-between; padding:0 17px; background:var(--surface); color:var(--muted); font-size:10px; font-weight:680; letter-spacing:.03em; }
+.status-right { display:flex; gap:6px; align-items:center; }
+.status-dot { width:7px; height:7px; border-radius:50%; background:var(--teal); display:inline-block; }
+.app-header { min-height:57px; padding:7px 17px; display:flex; align-items:center; justify-content:space-between; gap:12px; background:var(--surface); border-bottom:1px solid var(--line); z-index:2; }
+.app-header .brand-word { font-size:13px; letter-spacing:.13em; }
+.header-meta { display:flex; align-items:center; gap:7px; }
+.mini-chip { display:inline-flex; align-items:center; gap:5px; padding:6px 8px; border-radius:999px; background:var(--surface-2); color:var(--muted); font-size:9px; line-height:1; font-weight:700; white-space:nowrap; }
+.mini-chip.live { color:var(--teal); background:var(--teal-soft); }
+.demo-ribbon { background:#f4e8cd; color:#75521c; padding:5px 12px; text-align:center; font-size:9px; font-weight:730; letter-spacing:.045em; }
+.screen { flex:1; overflow:auto; overscroll-behavior:contain; padding:17px 17px 24px; scrollbar-width:thin; }
+.screen.no-pad { padding:0; }
+.screen-title { font-size:24px; line-height:1.15; letter-spacing:-.035em; margin:1px 0 5px; font-weight:750; color:var(--green); text-wrap:pretty; }
+.screen-subtitle { color:var(--muted); margin:0 0 17px; line-height:1.45; font-size:12px; }
+.eyebrow { color:var(--muted); font-size:9px; line-height:1.2; text-transform:uppercase; letter-spacing:.14em; font-weight:780; margin:0 0 7px; }
+.card { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-card); padding:14px; margin:0 0 12px; }
+.card.soft { background:var(--surface-2); border-color:transparent; }
+.card-head { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px; }
+.card-title { margin:0; font-size:13px; font-weight:730; letter-spacing:-.01em; }
+.small { font-size:10px; line-height:1.45; color:var(--muted); }
+.micro { font-size:9px; color:var(--muted); line-height:1.4; }
+.muted { color:var(--muted); }
+.row { display:flex; align-items:center; gap:10px; }
+.row.between { justify-content:space-between; }
+.stack { display:flex; flex-direction:column; gap:8px; }
+.gap4 { gap:4px; }
+.btn { width:100%; min-height:48px; border-radius:var(--radius-control); border:1px solid transparent; display:flex; align-items:center; justify-content:center; gap:8px; padding:11px 14px; cursor:pointer; font-weight:730; font-size:12px; text-decoration:none; transition:transform .12s ease, background .16s ease; }
+.btn:active { transform:scale(.985); }
+.btn.primary { background:var(--green); color:#fffefa; }
+.btn.primary:hover { background:var(--green-2); }
+.btn.secondary { background:var(--surface); border-color:var(--line); color:var(--green); }
+.btn.tertiary { color:var(--green); background:transparent; }
+.btn.warn { color:var(--red); border-color:rgba(163,63,53,.25); background:transparent; }
+.btn.inline { width:auto; min-height:40px; padding:8px 11px; }
+.btn.small-btn { min-height:40px; font-size:11px; }
+.text-button { border:0; background:none; color:var(--teal); font-weight:720; padding:8px; cursor:pointer; min-height:40px; }
+.field { display:flex; flex-direction:column; gap:6px; margin-bottom:12px; }
+.field label { font-size:10px; font-weight:710; color:var(--muted); }
+.field input, .field textarea, .search-input { background:var(--surface); color:var(--ink); border:1px solid var(--line); border-radius:12px; min-height:48px; padding:12px; width:100%; }
+.field textarea { min-height:88px; resize:vertical; }
+.search-input { padding-left:41px; }
+.search-shell { position:relative; margin-bottom:12px; }
+.search-shell .search-glyph { position:absolute; top:11px; left:14px; font-size:15px; color:var(--muted); }
+.chips { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:12px; }
+.chip { border:1px solid var(--line); background:var(--surface); color:var(--muted); border-radius:999px; min-height:39px; padding:8px 12px; font-size:10px; font-weight:680; cursor:pointer; }
+.chip.selected { background:var(--green); color:var(--surface); border-color:var(--green); }
+.evidence { display:inline-flex; align-items:center; gap:5px; max-width:100%; border-radius:999px; padding:5px 8px; font-size:9px; font-weight:760; letter-spacing:.025em; white-space:nowrap; }
+.evidence::before { content:""; display:block; width:6px; height:6px; border-radius:50%; background:currentColor; }
+.evidence.observed { color:var(--teal); background:var(--teal-soft); }
+.evidence.estimated { color:var(--amber); background:var(--amber-soft); }
+.evidence.stale { color:var(--neutral); background:var(--surface-2); border:1px dashed currentColor; }
+.evidence.unavailable { color:var(--neutral); background:transparent; border:1px solid var(--line); }
+.stat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.stat { padding:10px 9px; border-radius:13px; background:var(--surface-2); min-width:0; }
+.stat strong { display:block; font-variant-numeric:tabular-nums; font-size:16px; letter-spacing:-.04em; color:var(--green); }
+.stat span { display:block; margin-top:3px; font-size:9px; color:var(--muted); line-height:1.25; }
+.map-art { height:225px; border-radius:16px; overflow:hidden; position:relative; background:#e4e9df; border:1px solid rgba(23,57,48,.12); }
+.map-art.tall { height:355px; border-radius:0; border:0; }
+.map-art svg { display:block; width:100%; height:100%; }
+.map-label { position:absolute; z-index:1; background:rgba(255,254,250,.94); border:1px solid rgba(23,57,48,.12); border-radius:9px; padding:6px 8px; color:#294239; font-size:9px; font-weight:700; box-shadow:0 2px 8px rgba(22,40,32,.08); }
+.map-label.l1 { top:21%; left:9%; }
+.map-label.l2 { top:57%; right:7%; }
+.map-label.l3 { bottom:13%; left:40%; }
+.map-controls { position:absolute; right:10px; top:10px; display:grid; gap:6px; }
+.map-control { background:var(--surface); border:1px solid var(--line); border-radius:11px; min-height:42px; min-width:42px; padding:0 9px; color:var(--green); font-size:10px; font-weight:700; box-shadow:0 2px 8px rgba(20,40,32,.08); cursor:pointer; }
+.map-legend { display:flex; flex-wrap:wrap; align-items:center; gap:9px; color:var(--muted); font-size:9px; padding:10px 12px; background:var(--surface); }
+.legend-item { display:flex; align-items:center; gap:5px; }
+.legend-dot { width:8px; height:8px; border-radius:50%; background:var(--teal); }
+.legend-area { width:10px; height:10px; border:1px solid var(--teal); background:rgba(8,118,111,.14); }
+.legend-line { width:19px; height:0; border-top:2px solid var(--green); }
+.legend-line.dashed { border-top-style:dashed; border-color:var(--teal); }
+.map-panel { margin:-17px 0 0; position:relative; z-index:1; border-radius:18px 18px 0 0; background:var(--paper); padding:15px 17px 18px; box-shadow:0 -7px 18px rgba(25,49,40,.08); }
+.handle { width:34px; height:4px; border-radius:5px; background:var(--line); margin:0 auto 12px; }
+.route-card { border-left:0; }
+.route-key { display:flex; gap:8px; align-items:center; font-size:10px; color:var(--muted); }
+.route-swatch { height:0; width:25px; border-top:3px solid var(--green); }
+.route-swatch.actual { border-top:3px dashed var(--teal); }
+.bottom-nav { display:grid; grid-template-columns:repeat(5,1fr); height:63px; flex:0 0 63px; background:var(--surface); border-top:1px solid var(--line); padding:4px 5px 6px; z-index:2; }
+.nav-item { border:0; background:transparent; color:#748078; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; cursor:pointer; font-size:9px; min-width:0; }
+.nav-item .nav-mark { width:24px; height:22px; display:grid; place-items:center; font-size:15px; border-radius:9px; }
+.nav-item.active { color:var(--green); font-weight:760; }
+.nav-item.active .nav-mark { background:var(--teal-soft); color:var(--teal); }
+.quick-dock { position:absolute; right:14px; bottom:75px; z-index:4; }
+.quick-main { background:var(--green); color:white; border:0; border-radius:15px; box-shadow:0 6px 18px rgba(15,42,34,.22); min-height:48px; padding:0 14px; font-weight:730; cursor:pointer; }
+.quick-menu { display:none; position:absolute; right:0; bottom:56px; width:190px; padding:7px; border:1px solid var(--line); border-radius:15px; background:var(--surface); box-shadow:0 12px 32px rgba(20,38,31,.18); }
+.quick-menu.open { display:block; }
+.quick-menu button { width:100%; text-align:left; background:transparent; border:0; padding:11px 9px; border-radius:10px; min-height:44px; cursor:pointer; font-weight:650; color:var(--ink); font-size:11px; }
+.quick-menu button:hover { background:var(--surface-2); }
+.timeline-item { position:relative; padding:0 0 15px 20px; border-left:1px solid var(--line); margin-left:5px; }
+.timeline-item:last-child { border-left-color:transparent; padding-bottom:0; }
+.timeline-item::before { content:""; position:absolute; left:-5px; top:3px; width:9px; height:9px; border-radius:50%; background:var(--teal); border:2px solid var(--paper); }
+.empty-state { text-align:center; padding:22px 14px; }
+.empty-mark { margin:0 auto 12px; width:42px; height:42px; border-radius:14px; border:1px solid var(--line); display:grid; place-items:center; color:var(--teal); font-size:17px; }
+.empty-state h3 { margin:0 0 5px; font-size:13px; }
+.empty-state p { max-width:230px; margin:0 auto 12px; color:var(--muted); font-size:10px; line-height:1.5; }
+.metric { display:flex; justify-content:space-between; align-items:baseline; padding:10px 0; border-bottom:1px solid var(--line); }
+.metric:last-child { border-bottom:0; }
+.metric strong { color:var(--green); font-size:14px; font-variant-numeric:tabular-nums; }
+.notice { border-radius:13px; background:var(--amber-soft); color:#684713; padding:11px 12px; font-size:10px; line-height:1.45; }
+.notice.info { color:#31564f; background:var(--teal-soft); }
+.switch-row { display:flex; justify-content:space-between; align-items:center; padding:11px 0; border-bottom:1px solid var(--line); }
+.switch-row:last-child { border-bottom:0; }
+.toggle { width:38px; height:23px; border-radius:20px; border:0; background:#ccd2cc; padding:3px; cursor:pointer; }
+.toggle::after { content:""; display:block; width:17px; height:17px; border-radius:50%; background:white; transition:transform .15s; }
+.toggle.on { background:var(--teal); }
+.toggle.on::after { transform:translateX(15px); }
+.session-clock { font-size:38px; line-height:1; font-weight:760; letter-spacing:-.05em; font-variant-numeric:tabular-nums; color:var(--green); }
+.live-line { display:flex; align-items:center; gap:7px; color:var(--teal); font-size:10px; font-weight:750; }
+.live-pulse { height:8px; width:8px; border-radius:50%; background:var(--teal); box-shadow:0 0 0 4px var(--teal-soft); }
+.segmented { display:flex; gap:3px; padding:3px; border-radius:12px; background:var(--surface-2); }
+.segmented button { border:0; background:transparent; color:var(--muted); border-radius:9px; min-height:38px; padding:0 10px; font-size:10px; font-weight:700; flex:1; cursor:pointer; }
+.segmented button.active { background:var(--surface); color:var(--green); box-shadow:0 1px 3px rgba(20,38,31,.1); }
+.toast { position:absolute; bottom:78px; left:50%; transform:translateX(-50%); z-index:9; background:#1b322b; color:white; padding:11px 14px; border-radius:12px; font-size:10px; box-shadow:0 8px 24px rgba(0,0,0,.2); max-width:85%; text-align:center; display:none; }
+.toast.show { display:block; animation:fade-in .18s ease-out; }
+@keyframes fade-in { from { opacity:0; transform:translate(-50%,6px); } to { opacity:1; transform:translate(-50%,0); } }
+.inspector-card { padding:15px; background:rgba(255,254,250,.62); border:1px solid rgba(30,53,45,.1); border-radius:16px; margin-bottom:10px; }
+.inspector-card h3 { font-size:12px; margin:0 0 9px; }
+.inspector-card p { margin:0; color:var(--muted); font-size:10px; line-height:1.55; }
+.conf-row { display:flex; align-items:center; justify-content:space-between; padding:7px 0; border-bottom:1px solid rgba(30,53,45,.08); }
+.conf-row:last-child { border-bottom:0; }
+.conf-row span:last-child { font-size:9px; color:var(--muted); }
+.small-control { width:100%; min-height:40px; border:1px solid var(--line); border-radius:10px; background:var(--surface); color:var(--ink); padding:8px 10px; margin-top:8px; font-size:10px; }
+.disclaimer { font-size:9px; line-height:1.45; color:#6a756f; text-align:center; max-width:390px; padding:0 8px; }
+.screen-hidden { display:none; }
+.state-message { margin-top:8px; color:var(--muted); font-size:10px; min-height:15px; }
+.auth-logo { padding:16px 0 23px; }
+.onboard-mark { height:200px; border-radius:21px; margin:0 0 22px; overflow:hidden; position:relative; background:linear-gradient(145deg,#e2e9dc,#f7f2e5); border:1px solid var(--line); }
+.onboard-mark::before, .onboard-mark::after { content:""; position:absolute; border-radius:50%; border:1px solid rgba(8,118,111,.26); width:190px; height:190px; left:50%; top:48%; transform:translate(-50%,-50%); }
+.onboard-mark::after { width:122px; height:122px; }
+.onboard-center { position:absolute; z-index:1; inset:0; display:grid; place-items:center; color:var(--green); font-size:12px; font-weight:750; letter-spacing:.06em; }
+.proto-high { --paper:#f0eee4; --surface:#fff; --surface-2:#e8ebe4; --ink:#101b17; --muted:#42534a; --line:#aebbb0; --green:#123b30; }
+.proto-dark { color-scheme:dark; --canvas:#0d1714; --paper:#101a18; --surface:#192622; --surface-2:#21312c; --ink:#f0f2ea; --muted:#b4c0b8; --line:#34443d; --green:#b7d8c9; --green-2:#cde5d9; --teal:#63c4b5; --teal-soft:#203d37; --amber:#e9b85c; --amber-soft:#3c3322; --red:#f08c7e; --neutral:#a8b1ab; --shadow:0 28px 80px rgba(0,0,0,.38), 0 3px 10px rgba(0,0,0,.18); }
+.proto-dark .phone { border-color:#26352f; }
+.proto-dark .demo-ribbon { background:#40351f; color:#f0ca83; }
+.proto-dark .map-art { background:#273630; }
+.proto-dark .map-label { background:rgba(25,38,34,.95); color:#e9f0e9; border-color:#41554a; }
+.proto-dark .nav-item { color:#9ca9a1; }
+.proto-dark .nav-item.active { color:#e9f3ec; }
+.proto-dark .review-bar { background:rgba(21,32,28,.9); }
+.proto-dark .brand-word { color:#d4e5dc; }
+.proto-dark .review-tag { color:#b4c0b8; }
+.proto-dark .index-button { color:#c0ccc4; }
+.proto-dark .index-button.active { color:#102a25; }
+.proto-dark .inspector-card { background:rgba(25,38,34,.72); border-color:#34443d; }
+.proto-dark .stage-caption, .proto-dark .disclaimer { color:#b4c0b8; }
+.proto-dark .empty-mark { border-color:var(--line); }
+.proto-dark .stat strong, .proto-dark .metric strong, .proto-dark .session-clock, .proto-dark .screen-title { color:#d8e9df; }
+.proto-dark .notice.info { color:#b8e0d5; }
+.proto-dark .notice { color:#f0d199; }
+.proto-dark .quick-main { color:#102a25; }
+.proto-dark .index-button.active { background:#d7e7dd; }
+.proto-dark .phone-top, .proto-dark .app-header, .proto-dark .bottom-nav { background:var(--surface); }
+.proto-dark .bottom-nav { border-color:var(--line); }
+.proto-dark .map-panel { background:var(--paper); }
+@media (max-width: 1120px) {
+  .review-layout { grid-template-columns:190px minmax(380px,1fr); max-width:950px; }
+  .inspector { display:none; }
+}
+@media (max-width: 690px) {
+  body { background:var(--paper); }
+  .app-shell { display:block; }
+  .review-bar { height:52px; padding:0 12px; }
+  .review-tag { display:none; }
+  .review-controls select { max-width:130px; }
+  .review-controls button { padding:7px 9px; }
+  .review-layout { display:block; padding:0; }
+  .screen-index, .stage-caption, .disclaimer { display:none; }
+  .center-stage { display:block; }
+  .phone { border:0; border-radius:0; height:calc(100dvh - 52px); min-height:560px; width:100%; box-shadow:none; }
+  .phone-top { height:24px; flex-basis:24px; }
+}
+@media (max-height:740px) and (min-width:691px) {
+  .phone { height:calc(100vh - 104px); min-height:580px; }
+  .review-layout { padding-top:17px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+}
+</style>
+</head>
+<body>
+<div class="app-shell" id="appShell">
+  <header class="review-bar">
+    <div class="brandline"><span class="brand-word">FIELD EYE</span><span class="review-tag">M1 · Interface review</span></div>
+    <div class="review-controls">
+      <label class="screen-reader" for="themePick" style="position:absolute;left:-10000px">Prototype appearance</label>
+      <select id="themePick" aria-label="Prototype appearance">
+        <option value="light">Light theme</option>
+        <option value="dark">Dark theme</option>
+        <option value="high">High contrast</option>
+      </select>
+      <button id="offlineToggle" type="button" aria-label="Toggle simulated connection">Online demo</button>
+    </div>
+  </header>
+  <div class="review-layout">
+    <aside class="screen-index" aria-label="Prototype screen selector">
+      <div class="panel-kicker">Review screens</div>
+      <div id="screenIndex"></div>
+    </aside>
+    <main class="center-stage">
+      <div class="stage-caption"><span id="captionName">Home · Dashboard</span><span>Android-first · illustrative</span></div>
+      <div class="device-wrap">
+        <section class="phone" id="phone" aria-label="FIELD EYE mobile interface prototype">
+          <div class="phone-top"><span>9:41</span><span class="status-right"><span class="status-dot" id="connectDot"></span><span id="connectText">Connected</span><span>▮▮  ▰</span></span></div>
+          <header class="app-header" id="appHeader"></header>
+          <div class="demo-ribbon">INTERACTION PROTOTYPE · NO LIVE ACCOUNT, LOCATION, MAP OR MEASUREMENTS</div>
+          <section class="screen" id="screenContent" tabindex="0"></section>
+          <nav class="bottom-nav" id="bottomNav" aria-label="Main navigation"></nav>
+          <div class="quick-dock" id="quickDock"></div>
+          <div class="toast" id="toast" role="status" aria-live="polite"></div>
+        </section>
+      </div>
+      <div class="disclaimer">Map geometry and interactive service states are schematic. Any measurement-like UI is demonstration-only and is not a real observation.</div>
+    </main>
+    <aside class="inspector" aria-label="Design review notes">
+      <div class="panel-kicker">Design notes</div>
+      <section class="inspector-card"><h3>Evidence vocabulary</h3>
+        <div class="conf-row"><span class="evidence observed">Observed</span><span>Direct record</span></div>
+        <div class="conf-row"><span class="evidence estimated">Estimated</span><span>Calculated/provider</span></div>
+        <div class="conf-row"><span class="evidence stale">Stale</span><span>Old; timestamp shown</span></div>
+        <div class="conf-row"><span class="evidence unavailable">Unavailable</span><span>Never substitute zero</span></div>
+      </section>
+      <section class="inspector-card"><h3>Prototype states</h3><p>Choose a screen at left. The appearance switch exposes light, dark and high-contrast variants. Use the in-app controls to simulate permission, session, visit, connectivity and measurement states.</p></section>
+      <section class="inspector-card"><h3>Brand status</h3><p>Text-only temporary FIELD EYE identity. Official logo and permanent visual identity remain pending.</p></section>
+      <section class="inspector-card"><h3>Scope guardrail</h3><p>No Android project, live Google Maps, backend, Supabase schema, API credentials, paid calls or real location capture is present in this artifact.</p></section>
+      <section class="inspector-card"><h3>One-handed priority</h3><p>Primary actions and five-tab navigation stay reachable. Map details use a lower sheet; route and tracking evidence remain labeled.</p></section>
+    </aside>
+  </div>
+</div>
+<script>
+const screens = [
+  {group:'Entry', items:[['splash','Splash'],['onboarding','Onboarding'],['register','Registration'],['login','Login'],['location','Location education']]},
+  {group:'Field work', items:[['home','Home dashboard'],['map','Intelligence map'],['search','Place search'],['neighborhood','Neighbourhood detail'],['route','Route intelligence'],['session','Active session'],['visit','Record visit'],['activity','Activity']]},
+  {group:'Insights & account', items:[['network','Network intelligence'],['analytics','Analytics'],['profile','Profile & settings']]}
+];
+const titles = Object.fromEntries(screens.flatMap(group => group.items));
+const tabMap = [['home','⌂','Home'],['map','⌖','Map'],['activity','≡','Activity'],['analytics','▥','Analytics'],['profile','○','Profile']];
+let current = 'home';
+let theme = 'light';
+let isOffline = false;
+let permission = false;
+let sessionState = 'idle';
+let visitSaved = false;
+let visitCount = 0;
+let networkState = 'unavailable';
+let elapsed = 0;
+let timerHandle = null;
+let quickOpen = false;
+let chosenFilter = 'All';
+let selectedRange = '7 days';
+let toastHandle = null;
+
+function esc(v){ return String(v).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function mapArt(tall=false, route=false){
+  return `<div class="map-art ${tall?'tall':''}" aria-label="Schematic map illustration, not a live map">
+    <svg viewBox="0 0 390 255" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Illustrative street grid and boundary">
+      <rect width="390" height="255" fill="#e7ece2"/>
+      <path d="M-25 205 C52 168 94 192 151 151 S254 100 416 44" fill="none" stroke="#c9ddd3" stroke-width="31"/>
+      <path d="M-25 205 C52 168 94 192 151 151 S254 100 416 44" fill="none" stroke="#f5faf5" stroke-width="22"/>
+      <g fill="#dce7d7" opacity=".84"><path d="M19 20h88v48H19z"/><path d="M137 15h68v39h-68z"/><path d="M276 22h92v49h-92z"/><path d="M13 100h79v40H13z"/><path d="M222 84h84v42h-84z"/><path d="M314 148h73v43h-73z"/><path d="M87 211h76v32H87z"/></g>
+      <g fill="none" stroke="#fffefa" stroke-width="8" opacity=".96"><path d="M-10 88L405 104"/><path d="M-10 150L405 165"/><path d="M73 -12L82 265"/><path d="M164 -12L175 265"/><path d="M255 -12L267 265"/><path d="M338 -12L344 265"/><path d="M-10 237L405 7"/></g>
+      <g fill="none" stroke="#c7cec3" stroke-width="1.4"><path d="M-10 88L405 104"/><path d="M-10 150L405 165"/><path d="M73 -12L82 265"/><path d="M164 -12L175 265"/><path d="M255 -12L267 265"/><path d="M338 -12L344 265"/></g>
+      <path d="M33 62 C78 28 156 47 173 95 C192 147 147 211 83 204 C31 198 1 128 33 62Z" fill="rgba(8,118,111,.08)" stroke="#5b9a89" stroke-width="1.5" stroke-dasharray="5 4"/>
+      ${route?'<path d="M81 190 C126 170 139 141 173 132 S218 125 270 68" fill="none" stroke="#173a32" stroke-width="4" stroke-linecap="round"/><circle cx="81" cy="190" r="5" fill="#08766f" stroke="#fffefa" stroke-width="2"/><circle cx="270" cy="68" r="5" fill="#986000" stroke="#fffefa" stroke-width="2"/>':''}
+      <circle cx="134" cy="116" r="11" fill="rgba(8,118,111,.16)"/><circle cx="134" cy="116" r="5" fill="#08766f" stroke="#fffefa" stroke-width="2"/>
+    </svg>
+    <span class="map-label l1">Sample boundary</span><span class="map-label l2">Saved place · demo</span>
+    <div class="map-controls"><button class="map-control" data-action="locate" aria-label="Locate me">⌖</button><button class="map-control" data-screen="search" aria-label="Search places">⌕</button></div>
+  </div>`;
+}
+function header(){
+  const live = sessionState==='active' || sessionState==='paused';
+  return `<div class="brandline"><span class="brand-word">FIELD EYE</span></div><div class="header-meta"><span class="mini-chip ${live?'live':''}">${live?'● '+(sessionState==='active'?'RECORDING':'PAUSED'):'LOGO PENDING'}</span><span class="mini-chip" data-action="sync" role="button" tabindex="0">${isOffline?'OFFLINE · QUEUED':'SYNC READY'}</span></div>`;
+}
+function nav(){
+  const visible = ['home','map','activity','analytics','profile','session'].includes(current);
+  document.getElementById('bottomNav').style.display = visible ? 'grid':'none';
+  document.getElementById('quickDock').style.display = visible ? 'block':'none';
+  return tabMap.map(([id,mark,label])=>`<button class="nav-item ${current===id?'active':''}" data-screen="${id}" aria-label="${label}" ${current===id?'aria-current="page"':''}><span class="nav-mark" aria-hidden="true">${mark}</span><span>${label}</span></button>`).join('');
+}
+function quickDock(){
+  const label=sessionState==='active'?'Active session':sessionState==='paused'?'Resume session':'Field actions';
+  return `<div class="quick-menu ${quickOpen?'open':''}" id="quickMenu"><button data-action="start">${sessionState==='idle'?'Start field session':sessionState==='paused'?'Resume session':'Open active session'}</button><button data-screen="visit">Record visit</button><button data-action="locate">Locate me</button></div><button class="quick-main" data-action="quick">＋ ${label}</button>`;
+}
+function statePill(status='unavailable', text){return `<span class="evidence ${status}">${text||status[0].toUpperCase()+status.slice(1)}</span>`;}
+function currentScreen(){
+  const content=document.getElementById('screenContent');
+  content.classList.toggle('no-pad', current==='map');
+  switch(current){
+    case 'splash': return splash(); case 'onboarding': return onboarding(); case 'register': return register(); case 'login': return login(); case 'location': return locationScreen();
+    case 'home': return home(); case 'map': return mapScreen(); case 'search': return searchScreen(); case 'neighborhood': return neighborhood(); case 'route': return routeScreen();
+    case 'session': return sessionScreen(); case 'visit': return visitScreen(); case 'activity': return activityScreen(); case 'network': return networkScreen(); case 'analytics': return analyticsScreen(); case 'profile': return profileScreen(); default:return home();
+  }
+}
+function splash(){return `<div style="min-height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:30px"><div class="auth-logo"><div class="brand-word" style="font-size:19px">FIELD EYE</div><div class="micro" style="margin-top:7px;letter-spacing:.12em">LOGO PENDING</div></div><div class="onboard-mark" style="width:100%;max-width:280px"><div class="onboard-center">FIELD INTELLIGENCE · CONCEPT</div></div><p class="small" style="max-width:250px">A professional workspace for locations, routes and field records.</p><button class="btn primary" data-screen="onboarding" style="margin-top:19px">Continue to introduction</button><p class="micro" style="margin-top:15px">Startup does not request location or wait for sync.</p></div>`;}
+function onboarding(){return `<div class="eyebrow">Welcome · 01 / 03</div><div class="onboard-mark"><div class="onboard-center">MAP-FIRST · EVIDENCE-AWARE</div></div><h1 class="screen-title">Know the ground before you go.</h1><p class="screen-subtitle">Plan a visit, record what happened and review your own field activity.</p><div class="card soft"><div class="card-head"><p class="card-title">Your records, clearly labeled</p>${statePill('observed','Measured ≠ estimated')}</div><p class="small">Sessions and visits are designed to save locally first. Location is requested only when you choose a feature that needs it.</p></div><div class="row between" style="margin-top:18px"><button class="text-button" data-screen="login">I have an account</button><button class="btn primary inline" data-screen="register">Get started</button></div><p class="micro" style="text-align:center;margin-top:14px">Privacy information is available before account creation.</p>`;}
+function register(){return `<div class="eyebrow">Individual account</div><h1 class="screen-title">Create your account</h1><p class="screen-subtitle">Personal field records stay associated with your account.</p><div class="field"><label for="regEmail">Email</label><input id="regEmail" type="email" placeholder="name@example.com" autocomplete="email"></div><div class="field"><label for="regPass">Password</label><input id="regPass" type="password" placeholder="Choose a password" autocomplete="new-password"></div><div class="notice info" style="margin:4px 0 14px">Prototype only. No account is created and no information is submitted.</div><button class="btn primary" data-action="noSubmit">Create account</button><p class="small" style="text-align:center;margin:12px 0">By continuing, review the <button class="text-button" style="display:inline;padding:2px" data-action="privacy">privacy notice</button>.</p><div class="card soft row between"><span class="small">Already registered?</span><button class="text-button" data-screen="login">Sign in</button></div>`;}
+function login(){return `<div class="eyebrow">Welcome back</div><h1 class="screen-title">Sign in</h1><p class="screen-subtitle">Continue to your personal field workspace.</p><div class="field"><label for="loginEmail">Email</label><input id="loginEmail" type="email" placeholder="name@example.com" autocomplete="email"></div><div class="field"><label for="loginPass">Password</label><input id="loginPass" type="password" placeholder="Password" autocomplete="current-password"></div><div class="row between"><span></span><button class="text-button" data-action="reset">Forgot password?</button></div><button class="btn primary" data-action="noSubmit">Sign in</button><p class="small" style="text-align:center;margin:17px 0">Prototype only. Authentication is not connected.</p><div class="card soft row between"><span class="small">New to FIELD EYE?</span><button class="text-button" data-screen="register">Create account</button></div><button class="btn tertiary" data-screen="home">Preview Home without signing in</button>`;}
+function locationScreen(){return `<div class="eyebrow">Permission education · prototype</div><h1 class="screen-title">Location is your choice.</h1><p class="screen-subtitle">FIELD EYE asks for location when you use a feature that needs it. Approximate access may limit map precision.</p><div class="card"><div class="card-head"><p class="card-title">What this action needs</p>${statePill(permission?'observed':'unavailable',permission?'Demo permission state':'Not granted')}</div><p class="small">Current position is used to centre the map or attach a location to a visit. A field session can record location while active only after an explicit start.</p></div><div class="card soft"><p class="card-title">Choose a demo response</p><p class="small">These controls simulate an OS result for review. They do not trigger an Android permission dialog.</p><div class="stack" style="margin-top:10px"><button class="btn primary" data-action="allowLocation">Simulate foreground permission granted</button><button class="btn secondary" data-action="denyLocation">Simulate not now / denied</button></div></div><div class="notice">Background location is a separate product and policy decision. This prototype does not request it.</div><button class="btn tertiary" style="margin-top:12px" data-screen="map">Continue without location</button>`;}
+function home(){return `<div class="row between"><div><div class="eyebrow">Thursday · personal workspace</div><h1 class="screen-title">Home</h1></div>${statePill(isOffline?'stale':'observed',isOffline?'Offline':'Sync ready')}</div><p class="screen-subtitle">A clear view of today's field work.</p><div class="card" style="padding:0;overflow:hidden;cursor:pointer" data-screen="map"><div class="card-head" style="padding:13px 14px 0"><p class="card-title">Field map</p><span class="micro">Schematic preview · tap to open</span></div>${mapArt(false,false)}<div style="padding:0 13px 12px" class="map-legend"><span class="legend-item"><i class="legend-dot"></i>Current position</span><span class="legend-item"><i class="legend-area"></i>Boundary data pending</span></div></div><div class="card"><div class="card-head"><p class="card-title">Field session</p>${statePill(sessionState==='active'?'observed':'unavailable',sessionState==='active'?'Recording':sessionState==='paused'?'Paused':'Not started')}</div><p class="small">${sessionState==='active'?'Your demo session is active. Tracking status stays visible.':sessionState==='paused'?'Session paused. Resume when ready.':'Start only when you are ready to record field activity.'}</p><button class="btn ${sessionState==='active'?'secondary':'primary'} small-btn" data-action="start">${sessionState==='active'?'Open active session':sessionState==='paused'?'Resume session':'Start field session'}</button></div><div class="stat-grid"><div class="stat"><strong>—</strong><span>Recorded distance</span></div><div class="stat"><strong>—</strong><span>Field time</span></div><div class="stat"><strong>${visitCount||'—'}</strong><span>Visits · demo ${visitCount?'state':''}</span></div></div><div class="card" style="margin-top:12px"><div class="card-head"><p class="card-title">Recent activity</p><button class="text-button" data-screen="activity">View all</button></div>${visitSaved?'<div class="row between"><span class="small">Prototype visit · local demo only</span>'+statePill('stale','Not synced')+'</div>':'<p class="small">No recorded activity. Values stay blank until there is data.</p>'}</div>`;}
+function mapScreen(){return `<div class="map-art tall" aria-label="Schematic map, no live tiles">${mapArt(true,false).replace(/^<div class="map-art tall"[^>]*>/,'').replace(/<\/div>$/,'')}</div><div class="map-legend"><span class="legend-item"><i class="legend-dot"></i>Observed position</span><span class="legend-item"><i class="legend-area"></i>Boundary sample</span><span class="legend-item"><i class="legend-line"></i>Planned</span><span class="legend-item"><i class="legend-line dashed"></i>Recorded</span></div><div class="map-panel"><div class="handle"></div><div class="row between"><div><div class="eyebrow">Map intelligence</div><p class="card-title">Choose an area to inspect</p></div><button class="btn secondary inline small-btn" data-screen="search">Search</button></div><div class="chips" style="margin-top:10px"><button class="chip selected" data-action="layer">Places</button><button class="chip" data-action="layer">Neighbourhoods</button><button class="chip" data-screen="network">Network data</button></div><div class="row between"><span class="small">Position accuracy</span>${statePill(permission?'observed':'unavailable',permission?'Demo · accuracy not captured':'Unavailable')}</div><p class="micro" style="margin-top:6px">Schematic only. No live basemap, GPS fix or neighbourhood source.</p><div class="row" style="margin-top:10px"><button class="btn primary small-btn" data-screen="search">Search places</button><button class="btn secondary small-btn" data-action="locate">Locate me</button></div></div>`;}
+function searchScreen(){return `<div class="row between"><div><div class="eyebrow">Map intelligence</div><h1 class="screen-title">Search places</h1></div><button class="text-button" data-screen="map">Map</button></div><div class="search-shell"><span class="search-glyph">⌕</span><input class="search-input" id="placeQuery" placeholder="Place or area" aria-label="Search place or area"></div><div class="chips"><button class="chip ${chosenFilter==='All'?'selected':''}" data-filter="All">All</button><button class="chip ${chosenFilter==='Saved'?'selected':''}" data-filter="Saved">Saved</button><button class="chip ${chosenFilter==='Places'?'selected':''}" data-filter="Places">Places</button><button class="chip ${chosenFilter==='Areas'?'selected':''}" data-filter="Areas">Areas</button></div><div class="eyebrow">Source data · pending selection</div><div class="card"><div class="empty-state"><div class="empty-mark">⌕</div><h3>No live search source</h3><p>Place provider and searchable categories require approval. Saved personal places will appear here when available.</p><button class="btn secondary small-btn" data-screen="neighborhood">Preview area detail</button></div></div><div class="notice">No location permission is needed for text search. Distance from current position appears only when a location is available.</div>`;}
+function neighborhood(){return `<div class="row between"><button class="text-button" data-screen="map">‹ Map</button>${statePill('unavailable','Source pending')}</div><div class="eyebrow" style="margin-top:10px">Neighbourhood intelligence</div><h1 class="screen-title">Area details</h1><p class="screen-subtitle">Boundary and local information are shown only when a source is approved.</p><div class="card" style="padding:0;overflow:hidden">${mapArt(false,false)}<div style="padding:13px"><div class="row between"><p class="card-title">Neighbourhood name</p>${statePill('unavailable','Unavailable')}</div><p class="small">No boundary dataset is connected in this prototype.</p></div></div><div class="card"><div class="card-head"><p class="card-title">Data quality</p>${statePill('unavailable','Not assessed')}</div><div class="metric"><span class="small">Source</span><strong>Pending</strong></div><div class="metric"><span class="small">Last updated</span><strong>—</strong></div><div class="metric"><span class="small">Your visits</span><strong>—</strong></div></div><div class="notice">No opportunity score is shown. V1 needs a validated data source and approved deterministic method before presenting a rating.</div><button class="btn secondary" style="margin-top:13px" data-screen="route">Choose as destination</button>`;}
+function routeScreen(){return `<div class="eyebrow">Planned journey</div><h1 class="screen-title">Route intelligence</h1><p class="screen-subtitle">Review a route estimate before starting a session.</p><div class="card" style="padding:0;overflow:hidden">${mapArt(false,true)}<div class="map-legend"><span class="route-key"><i class="route-swatch"></i>Planned · solid</span><span class="route-key"><i class="route-swatch actual"></i>Recorded · dashed</span></div></div><div class="card"><div class="card-head"><p class="card-title">Route summary</p>${statePill('estimated','Estimate · provider pending')}</div><div class="metric"><span class="small">Distance</span><strong>—</strong></div><div class="metric"><span class="small">Travel time</span><strong>—</strong></div><div class="metric"><span class="small">Route source</span><strong>Not connected</strong></div><p class="micro">Origin and destination must be selected. No route result is fabricated.</p></div><div class="row" style="margin:2px 0 10px"><button class="btn secondary small-btn" data-screen="search">Choose destination</button><button class="btn secondary small-btn" data-action="route">Request demo route</button></div><div id="routeMessage" class="state-message">Alternatives are shown only when returned by an approved service.</div><button class="btn primary" data-action="start">Start field session</button>`;}
+function sessionScreen(){const active=sessionState==='active';const paused=sessionState==='paused';return `<div class="row between"><div class="live-line"><i class="live-pulse" style="${active?'':'background:var(--neutral);box-shadow:none'}"></i>${active?'SESSION RECORDING':paused?'SESSION PAUSED':'SESSION COMPLETE'}</div><button class="text-button" data-screen="map">Open map</button></div><div class="card" style="text-align:center;padding:22px 12px;margin-top:10px"><div class="eyebrow">Elapsed time · prototype timer</div><div class="session-clock" id="sessionClock">${formatTime(elapsed)}</div><p class="micro" style="margin-top:8px">Only a user-started session can record location.</p></div><div class="stat-grid"><div class="stat"><strong>—</strong><span>Recorded distance</span></div><div class="stat"><strong>${visitCount||'—'}</strong><span>Visits</span></div><div class="stat"><strong>${permission?'Demo state':'—'}</strong><span>GPS status</span></div></div><div class="card" style="margin-top:12px"><div class="card-head"><p class="card-title">Location evidence</p>${statePill(permission?'observed':'unavailable',permission?'Demo · no GPS sample':'Unavailable')}</div><div class="metric"><span class="small">Last sample</span><strong>—</strong></div><div class="metric"><span class="small">Accuracy</span><strong>—</strong></div><div class="row between" style="padding-top:9px"><span class="small">Sync state</span>${statePill(isOffline?'stale':'unavailable',isOffline?'Local queue':'No session data')}</div></div>${!permission?'<div class="notice">Location permission is not granted in this prototype. Simulate it before starting a recording session.</div>':''}<div class="stack" style="margin-top:12px"><button class="btn primary" data-action="pause" ${sessionState==='idle'?'disabled':''}>${active?'Pause session':paused?'Resume session':'Session not started'}</button><button class="btn secondary" data-screen="visit">＋ Record visit</button><button class="btn warn" data-action="end" ${sessionState==='idle'?'disabled':''}>End session</button></div><p class="micro" style="text-align:center;margin-top:12px">A real background session would show an Android system notification.</p>`;}
+function visitScreen(){return `<div class="row between"><div><div class="eyebrow">Field record · local-first intent</div><h1 class="screen-title">Record a visit</h1></div><button class="text-button" data-screen="map">Map</button></div><p class="screen-subtitle">Short, optional details. Save should work without a network connection.</p><div class="card soft"><div class="row between"><span class="small">Linked session</span>${statePill(sessionState==='active'?'observed':'unavailable',sessionState==='active'?'Active demo':'None')}</div></div><div class="field"><label for="visitPlace">Place (optional)</label><input id="visitPlace" placeholder="Search or select a saved place" aria-label="Visit place"></div><div class="card"><div class="row between"><span class="small">Location</span>${statePill(permission?'observed':'unavailable',permission?'Permission demo only':'Not attached')}</div><p class="micro" style="margin:8px 0 0">Record time: set on device at save. GPS accuracy: unavailable in this prototype.</p></div><div class="field"><label for="visitOutcome">Outcome (optional · categories pending approval)</label><select id="visitOutcome" class="small-control"><option value="">Choose only if useful</option><option>Follow-up needed · illustrative</option><option>Information collected · illustrative</option><option>Other · illustrative</option></select></div><div class="field"><label for="visitNotes">Notes</label><textarea id="visitNotes" placeholder="Add a concise field note"></textarea></div><button class="btn secondary" data-action="attachment">＋ Add attachment (not connected)</button><div id="visitMessage" class="state-message"></div><button class="btn primary" style="margin-top:11px" data-action="saveVisit">Save local demo record</button><p class="micro" style="text-align:center;margin-top:10px">Prototype simulation only. This does not save to a device or server.</p>`;}
+function activityScreen(){return `<div class="eyebrow">Personal history</div><div class="row between"><h1 class="screen-title">Activity</h1><span class="mini-chip">${isOffline?'OFFLINE':'SYNC READY'}</span></div><p class="screen-subtitle">Sessions and visits with their sync state.</p>${visitSaved?`<div class="card"><div class="card-head"><p class="card-title">Visit · prototype record</p>${statePill('stale','Demo · local only')}</div><div class="timeline-item"><p class="small">Created in this review prototype. Not persisted.</p><span class="micro">${new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})} · GPS unavailable</span></div><button class="btn secondary small-btn" data-screen="visit">Open visit form</button></div>`:`<div class="card"><div class="empty-state"><div class="empty-mark">≡</div><h3>No activity recorded</h3><p>Once you record a visit or end a session, the personal timeline appears here.</p><button class="btn primary small-btn" data-screen="visit">Record a visit</button></div></div>`}<div class="card soft"><div class="card-head"><p class="card-title">Synchronization</p>${statePill(isOffline?'stale':'unavailable',isOffline?'Queued locally':'No pending records')}</div><p class="small">Saved, queued, syncing and failed records must remain distinct. Retry should never create a duplicate.</p><button class="text-button" data-action="sync">Review sync state</button></div><button class="btn secondary" data-screen="analytics">Review analytics</button>`;}
+function networkScreen(){let cls=networkState;let badge=networkState==='observed'?'Observed · demo':networkState==='estimated'?'Estimated · demo':networkState==='stale'?'Stale · timestamp required':'Unavailable';let metricValue=networkState==='observed'?'Demo value · not real':networkState==='estimated'?'Provider estimate · demo':networkState==='stale'?'Old sample · demo':'—';return `<div class="eyebrow">Connectivity observations</div><h1 class="screen-title">Network intelligence</h1><p class="screen-subtitle">Your measurements only. A sparse sample is not a coverage claim.</p><div class="card"><div class="card-head"><p class="card-title">Latest measurement</p>${statePill(cls,badge)}</div><div class="metric"><span class="small">Signal / network type</span><strong>${metricValue}</strong></div><div class="metric"><span class="small">Download / upload</span><strong>—</strong></div><div class="metric"><span class="small">Latency / packet loss</span><strong>—</strong></div><div class="metric"><span class="small">Measured at</span><strong>${networkState==='stale'?'Timestamp required':'—'}</strong></div><div class="metric"><span class="small">GPS accuracy</span><strong>Unavailable</strong></div><p class="micro" style="margin-top:8px">Every reading needs a unit, source, timestamp and location-accuracy metadata when available.</p></div><div class="card soft"><div class="card-head"><p class="card-title">Inspect evidence state</p><span class="micro">Reviewer control</span></div><div class="segmented"><button data-net="observed" class="${networkState==='observed'?'active':''}">Observed</button><button data-net="estimated" class="${networkState==='estimated'?'active':''}">Estimated</button><button data-net="stale" class="${networkState==='stale'?'active':''}">Stale</button><button data-net="unavailable" class="${networkState==='unavailable'?'active':''}">Unavailable</button></div></div><div class="notice">A speed test is opt-in and may use mobile data and battery. No test is run by this prototype.</div><button class="btn primary" style="margin-top:12px" data-action="measure">Measure now · simulate</button><div class="state-message" id="measureMessage"></div>`;}
+function analyticsScreen(){return `<div class="eyebrow">Personal performance</div><h1 class="screen-title">Analytics</h1><p class="screen-subtitle">Calculated from your recorded sessions and visits.</p><div class="segmented">${['7 days','30 days','All time'].map(x=>`<button class="${selectedRange===x?'active':''}" data-range="${x}">${x}</button>`).join('')}</div><div class="card" style="margin-top:12px"><div class="card-head"><p class="card-title">${selectedRange} · recorded activity</p>${statePill('unavailable','No records')}</div><div class="empty-state"><div class="empty-mark">▥</div><h3>Not enough data yet</h3><p>Recorded time, distance and visits will appear when source records exist and sync completeness is known.</p></div></div><div class="card"><div class="card-head"><p class="card-title">Metric definitions</p><span class="micro">Deterministic</span></div><div class="metric"><span class="small">Distance</span><strong>Recorded GPS samples</strong></div><div class="metric"><span class="small">Duration</span><strong>Session timestamps</strong></div><div class="metric"><span class="small">Route estimate</span><strong>Shown separately</strong></div><p class="micro" style="margin-top:8px">Comparisons require a defined method and sufficient underlying data.</p></div><button class="btn secondary" data-screen="activity">Open activity history</button>`;}
+function profileScreen(){return `<div class="eyebrow">Personal account</div><h1 class="screen-title">Profile & settings</h1><p class="screen-subtitle">Privacy, location and display controls.</p><div class="card"><div class="row"><div class="empty-mark" style="margin:0">FE</div><div><p class="card-title">Individual account</p><p class="small">Signed-in account details are not connected in this prototype.</p></div></div></div><div class="card"><div class="card-head"><p class="card-title">Appearance</p><span class="micro">Reviewer variant above</span></div><div class="switch-row"><span class="small">Follow system theme</span><button class="toggle on" aria-label="Follow system theme"></button></div><div class="switch-row"><span class="small">Map style</span><span class="mini-chip">Light / dark</span></div></div><div class="card"><div class="card-head"><p class="card-title">Location and tracking</p>${statePill(permission?'observed':'unavailable',permission?'Demo allowed':'Not granted')}</div><div class="switch-row"><span class="small">Active-session tracking</span><button class="toggle ${sessionState==='active'?'on':''}" data-action="start" aria-label="Toggle demo session"></button></div><button class="text-button" data-screen="location">Review location explanation</button></div><div class="card"><div class="card-title">Privacy and records</div><button class="text-button" data-action="privacy">Privacy policy</button><div class="switch-row"><span class="small">Data export</span><button class="text-button" data-action="pending">Not configured</button></div><div class="switch-row"><span class="small">Account deletion</span><button class="text-button" data-action="pending">Not configured</button></div></div><div class="card soft"><div class="row between"><span class="small">Synchronization</span>${statePill(isOffline?'stale':'unavailable',isOffline?'Offline queue':'Not connected')}</div><button class="btn secondary small-btn" style="margin-top:10px" data-action="sync">Review sync state</button></div><button class="btn warn" data-action="pending">Sign out · not connected</button>`;}
+function formatTime(s){const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;}
+function render(){
+  document.documentElement.classList.remove('proto-dark','proto-high');
+  if(theme==='dark') document.body.classList.add('proto-dark'); else document.body.classList.remove('proto-dark');
+  if(theme==='high') document.body.classList.add('proto-high'); else document.body.classList.remove('proto-high');
+  document.getElementById('themePick').value=theme;
+  document.getElementById('appHeader').innerHTML=header();
+  document.getElementById('screenContent').innerHTML=currentScreen();
+  document.getElementById('bottomNav').innerHTML=nav();
+  document.getElementById('quickDock').innerHTML=quickDock();
+  document.getElementById('connectText').textContent=isOffline?'Offline':'Connected';
+  document.getElementById('connectDot').style.background=isOffline?'var(--amber)':'var(--teal)';
+  document.getElementById('offlineToggle').textContent=isOffline?'Offline demo':'Online demo';
+  document.getElementById('captionName').textContent=(titles[current]||'Home')+' · review';
+  document.querySelectorAll('.index-button').forEach(b=>b.classList.toggle('active',b.dataset.screen===current));
+}
+function showToast(message){const t=document.getElementById('toast'); t.textContent=message; t.classList.add('show'); clearTimeout(toastHandle); toastHandle=setTimeout(()=>t.classList.remove('show'),2400);}
+function go(screen){ current=screen; quickOpen=false; render(); const el=document.getElementById('screenContent'); if(el)el.scrollTop=0; }
+function startSession(){if(!permission){go('location'); showToast('Location education first · no OS dialog in prototype'); return;} if(sessionState==='active'){go('session');return;} if(sessionState==='paused'){sessionState='active';go('session');showToast('Demo session resumed');return;} sessionState='active'; if(!timerHandle)timerHandle=setInterval(()=>{if(sessionState==='active'){elapsed++;const c=document.getElementById('sessionClock');if(c)c.textContent=formatTime(elapsed);}},1000); go('session'); showToast('Demo session active · not tracking location');}
+function handleAction(action, ev){
+  if(action==='quick'){quickOpen=!quickOpen;document.getElementById('quickMenu')?.classList.toggle('open',quickOpen);return;}
+  if(action==='start'){startSession();return;}
+  if(action==='locate'){if(!permission){go('location');showToast('Choose a demo permission state');}else{go('map');showToast('Map recentered in demonstration only');}return;}
+  if(action==='allowLocation'){permission=true;go('map');showToast('Demo state only · no device permission changed');return;}
+  if(action==='denyLocation'){permission=false;go('map');showToast('Map remains available without current location');return;}
+  if(action==='pause'){if(sessionState==='active'){sessionState='paused';showToast('Demo session paused');}else if(sessionState==='paused'){sessionState='active';showToast('Demo session resumed');}else{showToast('Start a session first');}render();return;}
+  if(action==='end'){if(sessionState==='idle'){showToast('No active session');return;}if(confirm('End the simulated demo session? No real tracking is active.')){sessionState='idle';clearInterval(timerHandle);timerHandle=null;go('activity');showToast('Demo session ended · no data persisted');}return;}
+  if(action==='saveVisit'){visitSaved=true;visitCount=1;go('activity');showToast('Prototype-only local demo state · not saved');return;}
+  if(action==='measure'){const m=document.getElementById('measureMessage'); if(m)m.textContent='Simulation only. No speed or signal test was started.';showToast('No network measurement was performed');return;}
+  if(action==='route'){const m=document.getElementById('routeMessage');if(m)m.textContent='No live route service connected. Distance and duration remain unavailable.';showToast('No route request was sent');return;}
+  if(action==='noSubmit'){showToast('Prototype only · form data was not sent');return;}
+  if(action==='reset'){showToast('Password recovery is not connected');return;}
+  if(action==='privacy'){showToast('Privacy policy link awaits approved production URL');return;}
+  if(action==='attachment'){showToast('Attachments are not connected in this prototype');return;}
+  if(action==='pending'){showToast('This account action requires an approved implementation');return;}
+  if(action==='sync'){showToast(isOffline?'Demo queue · no record is synced':'No backend connection · sync not performed');return;}
+  if(action==='layer'){const b=ev.target.closest('button');b.classList.toggle('selected');showToast('Layer toggle shown for interface review');return;}
+}
+function buildIndex(){document.getElementById('screenIndex').innerHTML=screens.map(g=>`<div class="index-group"><h2>${esc(g.group)}</h2>${g.items.map(([id,label],i)=>`<button class="index-button" data-screen="${id}"><span class="num">${String(i+1).padStart(2,'0')}</span><span>${esc(label)}</span></button>`).join('')}</div>`).join('');}
+buildIndex();
+document.body.addEventListener('click',e=>{
+  const screen=e.target.closest('[data-screen]');if(screen){e.preventDefault();go(screen.dataset.screen);return;}
+  const action=e.target.closest('[data-action]');if(action){handleAction(action.dataset.action,e);return;}
+  const filter=e.target.closest('[data-filter]');if(filter){chosenFilter=filter.dataset.filter;render();return;}
+  const net=e.target.closest('[data-net]');if(net){networkState=net.dataset.net;render();return;}
+  const range=e.target.closest('[data-range]');if(range){selectedRange=range.dataset.range;render();return;}
+});
+document.body.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('[role="button"][data-action]')){e.preventDefault();handleAction(e.target.dataset.action,e);}});
+document.getElementById('themePick').addEventListener('change',e=>{theme=e.target.value;render();});
+document.getElementById('offlineToggle').addEventListener('click',()=>{isOffline=!isOffline;render();showToast(isOffline?'Offline demo state · records are not actually queued':'Connected demo state · backend not connected');});
+render();
+</script>
+</body>
+</html>
