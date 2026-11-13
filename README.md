@@ -1,15 +1,16 @@
 # FUSE: FIELD EYE
 
-**Project status: PRE-DEVELOPMENT — UI/UX REVIEW**
+**Project status: PRE-DEVELOPMENT — TECHNICAL ARCHITECTURE REVIEW**
 
-FIELD EYE is a proposed native Android field-intelligence application for independent field agents. The project is at the pre-development review stage. This repository contains the approved V1 UI/UX review material; it is not an Android application or deployed service.
+FIELD EYE is a proposed native Android field-intelligence application for independent field agents. The V1 UI/UX screenshots and prototype have been reviewed and approved by the project owner, according to the owner-provided architecture assignment. The V1 technical architecture is now submitted for review. This repository is not an Android application or deployed service.
 
-## Available review materials
+## Review materials
 
 - [Product brief](docs/product-brief.md)
 - [UI/UX Design Specification V1](docs/ui-ux-spec-v1.md)
 - [Interactive HTML prototype](prototype/FIELD_EYE_UI_UX_PROTOTYPE_V1.html)
-- [Architecture status](docs/architecture.md) — approved stack recorded; technical architecture intentionally deferred.
+- [Technical Architecture and Feasibility V1](docs/technical-architecture-v1.md) — draft for review; recommendations and unresolved decisions are labelled separately.
+- [Architecture status](docs/architecture.md)
 - [Decisions and open approvals](docs/decisions.md)
 - [Review log](docs/review-log.md)
 
@@ -17,10 +18,10 @@ The `android/` and `supabase/` directories are reserved for later work and conta
 
 ## Review status and boundaries
 
-The UI/UX specification and prototype are supplied for independent review and project-owner approval. No Android development, production database changes, Supabase deployment, live map integration, credential use, or paid API calls are part of this milestone. Do not begin technical architecture or implementation until the independent review and project-owner approval are complete.
+The UI/UX V1 has been approved for transition into technical architecture. The architecture document is a review draft and does not approve Android development, database migrations, Supabase project/resource changes, Google Cloud configuration, deployment, credential creation, or paid API use. Those steps require separate project-owner approval.
 
-The prototype is a self-contained browser-based interaction aid. It uses schematic map artwork and demo-only controls; it has no live account, location, map, network measurement, backend, or persistence. See the specification for its limitations and design decisions pending approval.
+The prototype remains a self-contained browser-based review artifact. It uses schematic map artwork and demo-only controls; it has no live account, location, map, network measurement, backend, or persistence. See the specification and architecture draft for assumptions and open decisions.
 
 ## Repository provenance
 
-The existing public repository was empty when inspected on 12 November 2026: it had no files, branches, or commits. This initial commit adds the review materials and status scaffolding without replacing prior repository work.
+The existing public repository was empty when inspected on 12 November 2026: it had no files, branches, or commits. The initial commit added the UI/UX review materials without replacing prior repository work. Architecture work is maintained on a separate review branch and is not merged to `main`.
