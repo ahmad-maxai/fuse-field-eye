@@ -15,11 +15,13 @@ supabase/.temp/
 
 # Android / Gradle generated files
 .gradle/
+**/.gradle/
 /build/
 **/build/
 .cxx/
 .externalNativeBuild/
 captures/
+.kotlin/
 
 # IDE and OS files
 .idea/
